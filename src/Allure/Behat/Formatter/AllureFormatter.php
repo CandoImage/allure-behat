@@ -85,6 +85,7 @@ class AllureFormatter implements Formatter
   protected $testIdTagPrefix;
   protected $ignoredTags;
   protected $severity_key;
+  protected $attachments_per_case = false;
   protected $parameters;
   protected $printer;
   protected $outlineCounter = 0;
@@ -99,13 +100,22 @@ class AllureFormatter implements Formatter
 
   use AttachmentSupport;
 
-  public function __construct($name, $issue_tag_prefix, $test_id_tag_prefix, $ignoredTags, $severity_key, $base_path, $presenter)
-  {
+  public function __construct(
+    $name,
+    $issue_tag_prefix,
+    $test_id_tag_prefix,
+    $ignoredTags,
+    $severity_key,
+    $attachments_per_case,
+    $base_path,
+    $presenter
+  ) {
     $this->name = $name;
     $this->issueTagPrefix = $issue_tag_prefix;
     $this->testIdTagPrefix = $test_id_tag_prefix;
     $this->ignoredTags = $ignoredTags;
     $this->severity_key = $severity_key;
+    $this->attachments_per_case = $attachments_per_case;
     $this->base_path = $base_path;
     $this->presenter = $presenter;
     $this->timer = new Timer();
@@ -271,7 +281,9 @@ class AllureFormatter implements Formatter
     $annotationManager->updateTestCaseEvent($scenarioEvent);
 
     $this->getLifeCycle()->fire($scenarioEvent->withTitle($scenario->getTitle()));
-
+    if ($this->attachments_per_case) {
+      $this->attachment = [];
+    }
   }
 
   public function onAfterScenarioTested(AfterScenarioTested $event)
